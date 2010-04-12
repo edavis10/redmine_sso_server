@@ -1,8 +1,10 @@
 require 'test_helper'
 
 class UserTest < ActiveSupport::TestCase
-  # Replace this with your real tests.
-  test "the truth" do
-    assert true
-  end
+  should_validate_presence_of :login
+  should_validate_presence_of :firstname
+  should_validate_presence_of :lastname
+  should_validate_presence_of :mail
+  
+  should_callback :store_password_hash, :before_save
 end
