@@ -25,6 +25,22 @@ class User < ActiveRecord::Base
     self.hashed_password = User.hash_password(self.password) if self.password
   end
 
+  # Try to login using the user's login or id and their plaintext password.
+  def self.try_to_login(login_or_user_id, password)
+    return nil if password.blank? || login_or_user_id.blank?
+
+    user = User.find_by_login(login_or_user_id) # login
+    user ||= User.find(login_or_user_id) # id
+
+    if user
+      if User.hash_password(password) == user.hashed_password
+        user
+      else
+        nil
+      end
+    end
+  end
+  
   def self.new_from_limited_attributes(params)
     User.new do |user|
       user.login = params[:login]

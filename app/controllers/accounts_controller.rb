@@ -10,6 +10,20 @@ class AccountsController < InheritedResources::Base
     create!
   end
 
+  def update
+    # Try to login using the login or the record id
+    @user = User.try_to_login(params[:login], params[:password])
+    @user ||= User.try_to_login(params[:id], params[:password])
+    
+    respond_to do |format|
+      if @user && @user.update_attributes(params[:user])
+        format.xml { render(:text => @user.to_xml, :status => :ok) }
+      else
+        format.xml { render(:text => '', :status => :not_found) }
+      end
+    end
+  end
+
   def present
     @user = User.find_by_login(params[:login])
     @user ||= User.find_by_login(params[:id])

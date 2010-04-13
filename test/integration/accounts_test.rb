@@ -102,4 +102,135 @@ class AccountsTest < ActionController::IntegrationTest
     end
 
   end
+
+  context "PUT /accounts/user-login" do
+    setup do
+      @user = User.generate!(:login => 'jdoe',
+                             :password => 'password',
+                             :password_confirmation => 'password',
+                             :firstname => 'John',
+                             :lastname => 'Doe',
+                             :mail => 'jdoe@example.com')
+    end
+                               
+    context "with valid parameters" do
+      setup do
+        @valid_parameters = {
+          :login => 'jdoe',
+          :password => 'password',
+          :user => {
+            :login => 'newlogin',
+            :firstname => 'Johnny',
+            :lastname => 'Was Changed',
+            :mail => 'j@example.org',
+            :password => 'new_password',
+            :password_confirmation => 'new_password'
+          }
+        }
+      end
+      
+      should "return a Success status code" do
+        put '/accounts/jdoe.xml', @valid_parameters
+        assert_response :ok
+      end
+
+      should "not create any new User accounts" do
+        assert_no_difference('User.count') do
+          put '/accounts/jdoe.xml', @valid_parameters
+        end
+      end
+      
+      should "return a new user response in xml" do
+        put '/accounts/jdoe.xml', @valid_parameters
+        assert_select('user')
+      end
+
+      context "updating attributes" do
+        should "change login" do
+          put '/accounts/jdoe.xml', @valid_parameters
+
+          assert_select('user') do
+            assert_select('login', 'newlogin')
+          end
+
+          @user.reload
+          assert_equal 'newlogin', @user.login
+        end
+
+        should "change firstname" do
+          put '/accounts/jdoe.xml', @valid_parameters
+
+          assert_select('user') do
+            assert_select('firstname', 'Johnny')
+          end
+
+          @user.reload
+          assert_equal 'Johnny', @user.firstname
+        end
+
+        should "change lastname" do
+          put '/accounts/jdoe.xml', @valid_parameters
+
+          assert_select('user') do
+            assert_select('lastname', 'Was Changed')
+          end
+
+          @user.reload
+          assert_equal 'Was Changed', @user.lastname
+        end
+
+        should "change mail" do
+          put '/accounts/jdoe.xml', @valid_parameters
+
+          assert_select('user') do
+            assert_select('mail', 'j@example.org')
+          end
+
+          @user.reload
+          assert_equal 'j@example.org', @user.mail
+        end
+
+        should "change password" do
+          put '/accounts/jdoe.xml', @valid_parameters
+
+          assert_select('user') do
+            assert_select('hashed-password', 'f054ffc85b4c1615a7190ea0b248564bb1e9f9ab')
+          end
+
+          @user.reload
+          assert User.hash_password('new_password') == @user.hashed_password
+        end
+
+      end
+    end
+
+    context "with invalid parameters" do
+      should "return Not Found status code" do
+        put '/accounts/jdoe.xml', {}
+        assert_response :not_found
+      end
+    end
+
+    context "with a missing user" do
+      should "return Not Found status code" do
+        put '/accounts/no-user.xml', {}
+        assert_response :not_found
+      end
+    end
+    
+    context "with a valid user but invalid password" do
+      should "return Not Found status code" do
+        @user = User.generate!(:login => 'valid',
+                               :password => 'password',
+                               :password_confirmation => 'password',
+                               :firstname => 'John',
+                               :lastname => 'Doe',
+                               :mail => 'valid@example.com')
+
+        put '/accounts/valid.xml', :login => 'valid', :password => 'wrong'
+        assert_response :not_found
+      end
+    end
+
+  end
 end
