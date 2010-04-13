@@ -30,7 +30,7 @@ class User < ActiveRecord::Base
     return nil if password.blank? || login_or_user_id.blank?
 
     user = User.find_by_login(login_or_user_id) # login
-    user ||= User.find(login_or_user_id) # id
+    user ||= User.find_by_id(login_or_user_id) # id
 
     if user
       if User.hash_password(password) == user.hashed_password
