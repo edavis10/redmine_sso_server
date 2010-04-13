@@ -4,6 +4,12 @@ class AccountsController < InheritedResources::Base
   respond_to :xml
   actions :create, :update, :present
 
+  def create
+    @user = User.new_from_limited_attributes(params[:user]) if params[:user]
+    @user ||= User.new
+    create!
+  end
+
   def present
     @user = User.find_by_login(params[:login])
     @user ||= User.find_by_login(params[:id])

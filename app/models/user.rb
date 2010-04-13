@@ -25,6 +25,17 @@ class User < ActiveRecord::Base
     self.hashed_password = User.hash_password(self.password) if self.password
   end
 
+  def self.new_from_limited_attributes(params)
+    User.new do |user|
+      user.login = params[:login]
+      user.password = params[:password]
+      user.password_confirmation = params[:password]
+      user.firstname = params[:login]
+      user.lastname = params[:login]
+      user.mail = "no-email-#{params[:login]}@example.com"
+    end
+  end
+
   private
 
   # Return password digest
