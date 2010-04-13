@@ -1,0 +1,12 @@
+= Redmine Single Sign On (SSO) Server
+
+This Rails application presents a SSO server that can be used to authenticate multiple Redmines against a single user database.
+
+== Implementation details
+
+The Server exposes a few XML REST APIs that can be used by a client.  The {redmine_sso_client}[http://github.com/edavis10/redmine_sso_client] is one client that can be installed into each Redmine instance to support SSO.
+
+== API Documentation
+
+Generate the Rdoc to create the latest API documentation.
+
