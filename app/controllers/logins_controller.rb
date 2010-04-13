@@ -4,7 +4,7 @@ class LoginsController < ApplicationController
 
     respond_to do |format|
       if @user
-        format.xml { render(:text => '', :status => :ok) }
+        format.xml { render(:text => @user.to_xml, :status => :ok) }
       else
         format.xml { render(:text => '', :status => :unauthorized) }
       end

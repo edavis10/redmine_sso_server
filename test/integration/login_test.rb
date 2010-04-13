@@ -14,9 +14,13 @@ class LoginTest < ActionController::IntegrationTest
         assert_response :ok
       end
 
-      should "return an empty body" do
+      should "return a user response in xml" do
         post "/login.xml", :login => 'a-user', :password => 'test'
-        assert response.body.blank?
+
+        assert_select('user') do
+          assert_select('login', 'a-user')
+          assert_select('hashed-password')
+        end
       end
     end
 
