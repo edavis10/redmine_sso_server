@@ -2,6 +2,16 @@
 
 This Rails application presents a SSO server that can be used to authenticate multiple Redmines against a single user database.
 
+== Install
+
+This is a separate Ruby on Rails application from Redmine.  It's designed to work with Redmine over a network so you can host it however you'd like.  In production, it's highly recommended that you secure the communication with SSL, since the API passes passwords in the clear.
+
+1. Get a copy of the code (git clone git://github.com/edavis10/redmine_sso_server.git)
+2. Copy the example database.yml and configure it for your database for production. (cp config/database.yml.example config/database.yml)
+3. Migrate and setup the databases (rake db:migrate RAILS_ENV=production)
+4. Start the server (ruby script/server -e production)
+5. Configure the Redmine SSO Clients to connect to the server.  See the plugin's documentation for details)
+
 == Implementation details
 
 The Server exposes a few XML REST APIs that can be used by a client.  The {redmine_sso_client}[http://github.com/edavis10/redmine_sso_client] is one client that can be installed into each Redmine instance to support SSO.
